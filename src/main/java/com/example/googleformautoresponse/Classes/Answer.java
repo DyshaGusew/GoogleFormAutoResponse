@@ -1,4 +1,4 @@
-package com.example.googleformautoresponse;
+package com.example.googleformautoresponse.Classes;
 
 public class Answer {
     String entity;

@@ -6,4 +6,6 @@ module com.example.googleformautoresponse {
 
     opens com.example.googleformautoresponse to javafx.fxml;
     exports com.example.googleformautoresponse;
+    exports com.example.googleformautoresponse.Classes;
+    opens com.example.googleformautoresponse.Classes to javafx.fxml;
 }
