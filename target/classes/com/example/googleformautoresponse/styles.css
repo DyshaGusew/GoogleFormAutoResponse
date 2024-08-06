@@ -1,0 +1,41 @@
+.button {
+    -fx-font-size: 19px;
+    -fx-background-radius: 5px;
+    -fx-text-fill: #ffffff;
+}
+
+.button.delete {
+    -fx-background-color: #ff6666;
+}
+
+.button.delete:hover {
+    -fx-background-color: #ff4c4c;
+}
+
+.button.delete:pressed {
+    -fx-background-color: #cc3333;
+}
+
+.button.add {
+    -fx-background-color: #4CAF50;
+}
+
+.button.add:hover {
+    -fx-background-color: #45a049;
+}
+
+.button.add:pressed {
+    -fx-background-color: #388e3c;
+}
+
+.button.start {
+    -fx-background-color: #2196F3;
+}
+
+.button.start:hover {
+    -fx-background-color: #1e88e5;
+}
+
+.button.start:pressed {
+    -fx-background-color: #1976d2;
+}
