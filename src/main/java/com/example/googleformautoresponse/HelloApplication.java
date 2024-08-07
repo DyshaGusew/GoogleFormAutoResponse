@@ -14,7 +14,6 @@ public class HelloApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         stage.setTitle("GoogleHack");
-        HelloController.createResponse("http://httpbin.org/post", 5, new Answer[1]);
         stage.setScene(scene);
         stage.show();
     }

@@ -77,12 +77,13 @@ public class HelloController {
             ArrayList<Answer> allAnswer = new ArrayList<Answer>();
             ObservableList<Node> answerPlanes = placeQuestionVBox.getChildren();
 
+            // Create array of answers
             for (Node answerPlane : answerPlanes) {
                 if (answerPlane instanceof HBox) {
                     HBox lineAnswer = (HBox) answerPlane;
-                    String entityFiledText =((TextField) lineAnswer.getChildren().get(0)).getText();
-                    String frequencyFiledText = ((TextField) lineAnswer.getChildren().get(0)).getText();
-                    String answerFiledText = ((TextField) lineAnswer.getChildren().get(0)).getText();
+                    String entityFiledText =((TextField) lineAnswer.getChildren().get(1)).getText();
+                    String frequencyFiledText = ((TextField) lineAnswer.getChildren().get(2)).getText();
+                    String answerFiledText = ((TextField) lineAnswer.getChildren().get(3)).getText();
 
                     String entity = entityFiledText.trim();
                     float[] frequencyArr = convertFrequency(frequencyFiledText);
@@ -94,9 +95,36 @@ public class HelloController {
                 }
             }
 
+            HttpPostRequest httpPostRequest = new HttpPostRequest();
 
+            // Pushing data
+            for (int i = 0; i < num_responses; i++){
+                Map<String, String> postText = CreateHashPostText(allAnswer);
+                httpPostRequest.sendPostRequest(form_url, postText);
+                printHashMap(postText);
+
+                System.out.println("[Answer number " + (i + 1) + " sends]");
+            }
+
+            System.out.println("[All answers sends]");
         }
     }
+
+    public static void printHashMap(Map<String, String> map) {
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            System.out.println(entry.getKey() + " : " + entry.getValue());
+        }
+    }
+    private Map<String, String> CreateHashPostText(ArrayList<Answer> answers){
+        Map<String, String> postText = new HashMap<>();
+
+        for (Answer thisAnswer: answers) {
+            postText.put(thisAnswer.getEntity(), thisAnswer.getRandomAnswer());
+        }
+
+        return postText;
+    }
+
     private float[] convertFrequency(String frequencyString){
         String[] frequencyStrings = frequencyString.split("[,\\s]+");
         float[] frequencyArr = new float[frequencyStrings.length];
@@ -112,22 +140,9 @@ public class HelloController {
     }
 
     private boolean checkWrongs(){
-        if (urlInput.getText().equals("") || numAnswerInput.getText().equals("")){
-            return false;
-        }
+//        if (urlInput.getText().equals("") || numAnswerInput.getText().equals("")){
+//            return false;
+//        }
         return true;
-    }
-
-
-    public static void createResponse(String urlString, int numsAnswers,  Answer[] answers) throws IOException {
-        Map<String, String> postText = new HashMap<>();
-        postText.put("user", "admin");
-        postText.put("password", "123");
-
-        HttpPostRequest httpPostRequest = new HttpPostRequest();
-
-
-
-        httpPostRequest.sendPostRequest(urlString, postText);
     }
 }

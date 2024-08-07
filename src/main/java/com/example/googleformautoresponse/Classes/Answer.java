@@ -1,9 +1,13 @@
 package com.example.googleformautoresponse.Classes;
 
+import java.util.Random;
+
 public class Answer {
     String entity;
     float[] frequency;
     String[] answer;
+
+    Random random;
 
     public float[] getFrequency() {
         return frequency;
@@ -33,6 +37,29 @@ public class Answer {
         setAnswer(answers);
         setEntity(entity);
         setFrequency(frequency);
+        this.random = new Random();
+    }
+
+    public String getRandomAnswer() {
+        // Создаем кумулятивный массив частот
+        float[] cumulativeFrequency = new float[frequency.length];
+        cumulativeFrequency[0] = frequency[0];
+        for (int i = 1; i < frequency.length; i++) {
+            cumulativeFrequency[i] = cumulativeFrequency[i - 1] + frequency[i];
+        }
+
+        // Генерируем случайное число от 0 до 1
+        float rand = random.nextFloat();
+
+        // Определяем ответ на основе случайного числа и кумулятивного массива
+        for (int i = 0; i < cumulativeFrequency.length; i++) {
+            if (rand <= cumulativeFrequency[i]) {
+                return answer[i];
+            }
+        }
+
+        // На случай ошибок возвращаем последний ответ
+        return answer[answer.length - 1];
     }
 
     @Override
