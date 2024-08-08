@@ -95,10 +95,11 @@ public class HelloController {
                 }
             }
 
-            HttpPostRequest httpPostRequest = new HttpPostRequest();
+
 
             // Pushing data
             for (int i = 0; i < num_responses; i++){
+                HttpPostRequest httpPostRequest = new HttpPostRequest();
                 Map<String, String> postText = CreateHashPostText(allAnswer);
                 httpPostRequest.sendPostRequest(form_url, postText);
                 printHashMap(postText);

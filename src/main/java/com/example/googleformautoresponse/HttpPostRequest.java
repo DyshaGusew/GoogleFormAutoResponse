@@ -3,60 +3,100 @@ package com.example.googleformautoresponse;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
+import java.nio.charset.StandardCharsets;
+
 
 public class HttpPostRequest {
-    public void sendPostRequest(String urlString, Map<String, String> postText) {
-        try {
-            byte[] out = convertToJson(postText).getBytes(); //postText.toString().getBytes();
 
+    // Метод для отправки POST-запроса
+    public void sendPostRequest(String urlString, Map<String, String> postData) {
+        HttpURLConnection connection = null;
+        try {
+            // Преобразование данных в формат application/x-www-form-urlencoded
+            String postDataString = convertToUrlEncoded(postData);
+
+            // Создание URL и HttpURLConnection
             URL url = new URL(urlString);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
+
+            // Настройка HttpURLConnection
             setupConnection(connection);
 
+            // Отправка данных
             try (OutputStream os = connection.getOutputStream()) {
-                os.write(out);
+                os.write(postDataString.getBytes(StandardCharsets.UTF_8));
             }
 
+            // Получение кода ответа
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
                     StringBuilder response = new StringBuilder();
                     String line;
                     while ((line = reader.readLine()) != null) {
                         response.append(line);
                     }
-                    System.out.println(response.toString());
                 }
             } else {
                 System.err.println("Ошибка отправки на сервер. Код: " + responseCode);
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder errorResponse = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        errorResponse.append(line);
+                    }
+                    System.err.println("Ответ ошибки: " + errorResponse.toString());
+                }
             }
         } catch (Exception e) {
             System.err.println("Ошибка: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
     }
 
+    // Метод для настройки HttpURLConnection
     private void setupConnection(HttpURLConnection connection) throws Exception {
         connection.setRequestMethod("POST");
-        connection.setDoInput(true);
         connection.setDoOutput(true);
-        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36");
-        connection.setConnectTimeout(1000);
-        connection.setReadTimeout(1000);
-        connection.connect();
+        connection.setConnectTimeout(5000); // Время ожидания подключения
+        connection.setReadTimeout(5000); // Время ожидания чтения
     }
 
-    private String convertToJson(Map<String, String> map) {
-        StringBuilder json = new StringBuilder();
-        json.append("{");
+    // Метод для преобразования данных в формат application/x-www-form-urlencoded
+    private String convertToUrlEncoded(Map<String, String> map) throws UnsupportedEncodingException {
+        StringBuilder encodedString = new StringBuilder();
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            json.append("\"").append(entry.getKey()).append("\":\"").append(entry.getValue()).append("\",");
+            if (encodedString.length() != 0) {
+                encodedString.append('&');
+            }
+            encodedString.append(entry.getKey())
+                    .append('=')
+                    .append(java.net.URLEncoder.encode(entry.getValue(), "UTF-8"));
         }
-        json.deleteCharAt(json.length() - 1); // Удаляем последнюю запятую
-        json.append("}");
-        return json.toString();
+        return encodedString.toString();
+    }
+
+
+
+
+    // Пример использования
+    public static void main(String[] args) {
+        HttpPostRequest request = new HttpPostRequest();
+        Map<String, String> postData = Map.of(
+                "entry.1119440614", "Вариант4",
+                "entry.1668186261", "3"
+        );
+        request.sendPostRequest("https://docs.google.com/forms/d/e/1FAIpQLSeHfFYw2S0URXGh-U6uUqSZzVNUT49NOO1Ts6ErYS6Wnu_9iQ/formResponse", postData);
     }
 }
+
