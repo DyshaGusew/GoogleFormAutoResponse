@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import java.net.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
@@ -16,9 +15,9 @@
     </stylesheets>
     <HBox alignment="TOP_CENTER" prefHeight="59.0" prefWidth="560.0" spacing="10.0">
         <children>
-            <Pane prefHeight="59.0" prefWidth="362.0" style="-fx-background-color: #ffffff; -fx-border-color: #cccccc; -fx-border-radius: 5px; -fx-background-radius: 5px;">
+            <Pane prefHeight="73.0" prefWidth="362.0" style="-fx-background-color: #ffffff; -fx-border-color: #cccccc; -fx-border-radius: 5px; -fx-background-radius: 5px;">
                 <children>
-                    <TextField fx:id="urlInput" alignment="CENTER" layoutX="44.0" layoutY="16.0" prefHeight="25.0" prefWidth="273.0" promptText="Укажите URL" style="-fx-font-size: 13px;">
+                    <TextField fx:id="urlInput" alignment="CENTER" layoutX="45.0" layoutY="13.0" prefHeight="25.0" prefWidth="273.0" promptText="Укажите URL" style="-fx-font-size: 13px;">
                         <font>
                             <Font size="13.0" />
                         </font>
@@ -33,7 +32,7 @@
             </Pane>
             <Pane prefHeight="59.0" prefWidth="177.0" style="-fx-background-color: #ffffff; -fx-border-color: #cccccc; -fx-border-radius: 5px; -fx-background-radius: 5px;">
                 <children>
-                    <TextField fx:id="numAnswerInput" alignment="CENTER" layoutX="16.0" layoutY="16.0" prefHeight="27.0" prefWidth="139.0" promptText="Количество ответов" style="-fx-font-size: 13px;">
+                    <TextField fx:id="numAnswerInput" alignment="CENTER" layoutX="19.0" layoutY="13.0" prefHeight="27.0" prefWidth="139.0" promptText="Количество ответов" style="-fx-font-size: 13px;">
                         <font>
                             <Font size="13.0" />
                         </font>
@@ -45,19 +44,19 @@
             </Pane>
         </children>
     </HBox>
-    <ScrollPane fx:id="placeQuestionScroll" hbarPolicy="NEVER" prefHeight="226.0" prefWidth="560.0" style="-fx-background-color: #ffffff; -fx-border-color: #cccccc; -fx-border-radius: 5px; -fx-background-radius: 5px;">
+    <ScrollPane hbarPolicy="NEVER" prefHeight="226.0" prefWidth="560.0" style="-fx-background-color: #ffffff; -fx-border-color: #cccccc; -fx-border-radius: 5px; -fx-background-radius: 5px;">
         <content>
             <VBox fx:id="placeQuestionVBox" alignment="CENTER" prefWidth="540.0" spacing="20.0" style="-fx-padding: 10;">
             </VBox>
         </content>
     </ScrollPane>
-    <HBox alignment="CENTER" prefWidth="560.0" spacing="10.0">
+    <HBox alignment="CENTER" prefHeight="72.0" prefWidth="560.0" spacing="10.0" style="-fx-background-color: #ffffff; -fx-border-color: #cccccc; -fx-border-radius: 5px; -fx-background-radius: 5px;">
         <children>
-            <Button mnemonicParsing="false" onAction="#onDeleteQuestionButtonClick" prefHeight="38.0" prefWidth="71.0" styleClass="delete" text="–" textAlignment="CENTER" wrapText="true">
+            <Button mnemonicParsing="false" onAction="#onDeleteQuestionButtonClick" prefHeight="50.0" prefWidth="70.0" styleClass="delete" text="–" textAlignment="CENTER" wrapText="true">
             </Button>
-            <Button mnemonicParsing="false" onAction="#onAddQuestionButtonClick" prefHeight="38.0" prefWidth="71.0" styleClass="add" text="+" textAlignment="CENTER" wrapText="true">
+            <Button mnemonicParsing="false" onAction="#onAddQuestionButtonClick" prefHeight="50.0" prefWidth="70.0" styleClass="add" text="+" textAlignment="CENTER" wrapText="true">
             </Button>
-            <Button mnemonicParsing="false" onAction="#onStartButtonClick" prefHeight="51.0" prefWidth="149.0" styleClass="start" text="Начать" textAlignment="CENTER" wrapText="true">
+            <Button mnemonicParsing="false" onAction="#onStartButtonClick" prefHeight="50.0" prefWidth="135.0" styleClass="start" text="Начать" textAlignment="CENTER" wrapText="true">
                 <HBox.margin>
                     <Insets left="150.0" />
                 </HBox.margin>

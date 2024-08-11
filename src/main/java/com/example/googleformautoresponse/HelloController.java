@@ -5,23 +5,16 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.*;
 import java.util.ArrayList;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 
 
@@ -33,14 +26,12 @@ public class HelloController {
     private TextField numAnswerInput;
 
     @FXML
-    private ScrollPane placeQuestionScroll;
-
-    @FXML
     private VBox placeQuestionVBox;
 
 
     private int numsAnswer = 0;
 
+    // Add new line answer's
     @FXML
     protected void onAddQuestionButtonClick(){
         try {
@@ -58,6 +49,7 @@ public class HelloController {
         }
     }
 
+    // Delete last line answer's
     @FXML
     protected void onDeleteQuestionButtonClick() {
         ObservableList<Node> children = placeQuestionVBox.getChildren();
@@ -70,37 +62,44 @@ public class HelloController {
 
     @FXML
     protected void onStartButtonClick() {
-        if(checkWrongs()){
-            String form_url = urlInput.getText();
-            int num_responses = Integer.parseInt(numAnswerInput.getText());
+        String form_url = urlInput.getText();
+        String num_responses_text = numAnswerInput.getText();
+        ObservableList<Node> answerPlanes = placeQuestionVBox.getChildren();
 
-            ArrayList<Answer> allAnswer = new ArrayList<Answer>();
-            ObservableList<Node> answerPlanes = placeQuestionVBox.getChildren();
 
+        if(checkWrongsPage(form_url, num_responses_text, answerPlanes)){
             // Create array of answers
+            ArrayList<Answer> allAnswers = new ArrayList<>();
+            int counter = 0;
             for (Node answerPlane : answerPlanes) {
                 if (answerPlane instanceof HBox) {
+                    counter++;
                     HBox lineAnswer = (HBox) answerPlane;
                     String entityFiledText =((TextField) lineAnswer.getChildren().get(1)).getText();
                     String frequencyFiledText = ((TextField) lineAnswer.getChildren().get(2)).getText();
                     String answerFiledText = ((TextField) lineAnswer.getChildren().get(3)).getText();
 
-                    String entity = entityFiledText.trim();
-                    float[] frequencyArr = convertFrequency(frequencyFiledText);
-                    String[] answerArr = convertAnswer(answerFiledText);
+                    if(checkWrongsLine(entityFiledText, frequencyFiledText, answerFiledText, counter)){
+                        String entity = entityFiledText.trim();
+                        float[] frequencyArr = convertFrequency(frequencyFiledText);
+                        String[] answerArr = convertAnswer(answerFiledText);
 
-                    Answer answer = new Answer(entity, frequencyArr, answerArr);
+                        Answer answer = new Answer(entity, frequencyArr, answerArr);
 
-                    allAnswer.add(answer);
+                        allAnswers.add(answer);
+                    }
+                    else {
+                        return;
+                    }
                 }
             }
 
-
+            int num_responses = Integer.parseInt(num_responses_text);
 
             // Pushing data
             for (int i = 0; i < num_responses; i++){
                 HttpPostRequest httpPostRequest = new HttpPostRequest();
-                Map<String, String> postText = CreateHashPostText(allAnswer);
+                Map<String, String> postText = CreateHashPostText(allAnswers);
                 httpPostRequest.sendPostRequest(form_url, postText);
                 printHashMap(postText);
 
@@ -140,10 +139,42 @@ public class HelloController {
         return answerArr;
     }
 
-    private boolean checkWrongs(){
-//        if (urlInput.getText().equals("") || numAnswerInput.getText().equals("")){
-//            return false;
-//        }
+    private boolean checkWrongsPage(String form_url, String num_responses_text, ObservableList<Node> answerPlanes){
+        if (form_url.equals("")){
+            createWrongTable("НЕВЕРНЫЙ ВВОД", "Необходимо указать URL");
+            return false;
+        }
+        else if (num_responses_text.equals("")){
+            createWrongTable("НЕВЕРНЫЙ ВВОД", "Необходимо указать количество ответов");
+            return false;
+        }
+        else if (answerPlanes.isEmpty()){
+            createWrongTable("НЕВЕРНЫЙ ВВОД", "Необходимо добавить хотя бы одно поле с ответами");
+            return false;
+        }
         return true;
+    }
+
+    private boolean checkWrongsLine(String entityFiledText, String frequencyFiledText, String answerFiledText, int counterLine){
+        if (entityFiledText.equals("")){
+            createWrongTable("НЕВЕРНЫЙ ВВОД В ПОЛЕ НОМЕР " + counterLine, "Необходимо указать entity");
+            return false;
+        }
+        else if (frequencyFiledText.equals("")){
+            createWrongTable("НЕВЕРНЫЙ ВВОД В ПОЛЕ НОМЕР " + counterLine, "Необходимо указать частоты ответов");
+            return false;
+        }
+        else if (answerFiledText.isEmpty()){
+            createWrongTable("НЕВЕРНЫЙ ВВОД В ПОЛЕ НОМЕР " + counterLine, "Необходимо указать ответы");
+            return false;
+        }
+        return true;
+    }
+
+    private void createWrongTable(String textMain, String deepText){
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+        errorAlert.setHeaderText(textMain);
+        errorAlert.setContentText(deepText);
+        errorAlert.showAndWait();
     }
 }

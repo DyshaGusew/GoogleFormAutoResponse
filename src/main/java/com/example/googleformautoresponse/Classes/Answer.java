@@ -3,11 +3,11 @@ package com.example.googleformautoresponse.Classes;
 import java.util.Random;
 
 public class Answer {
-    String entity;
-    float[] frequency;
-    String[] answer;
+    private String entity;
+    private float[] frequency;
+    private String[] answer;
 
-    Random random;
+    private Random random;
 
     public float[] getFrequency() {
         return frequency;
