@@ -28,7 +28,6 @@ public class HelloController {
     @FXML
     private VBox placeQuestionVBox;
 
-
     private int numsAnswer = 0;
 
     // Add new line answer's
@@ -66,7 +65,6 @@ public class HelloController {
         String num_responses_text = numAnswerInput.getText();
         ObservableList<Node> answerPlanes = placeQuestionVBox.getChildren();
 
-
         if(checkWrongsPage(form_url, num_responses_text, answerPlanes)){
             // Create array of answers
             ArrayList<Answer> allAnswers = new ArrayList<>();
@@ -80,13 +78,27 @@ public class HelloController {
                     String answerFiledText = ((TextField) lineAnswer.getChildren().get(3)).getText();
 
                     if(checkWrongsLine(entityFiledText, frequencyFiledText, answerFiledText, counter)){
-                        String entity = entityFiledText.trim();
-                        float[] frequencyArr = convertFrequency(frequencyFiledText);
-                        String[] answerArr = convertAnswer(answerFiledText);
+                        String entity = convertEntity(entityFiledText.trim());
+                        String[] answerArr = convertAnswer(answerFiledText.trim());
 
-                        Answer answer = new Answer(entity, frequencyArr, answerArr);
+                        float[] frequencyArr;
+                        try {
+                            frequencyArr = convertFrequency(frequencyFiledText.trim());
+                        }
+                        catch (NumberFormatException e){
+                            createWrongTable("НЕВЕРНЫЙ ВВОД В ПОЛЕ НОМЕР " + counter, "Необходимо верно указать частоты (например <0,5 0.1 0.4>)");
+                            return;
+                        }
 
-                        allAnswers.add(answer);
+
+                        if(checkWrongsArrays(entity, frequencyArr, answerArr, counter)){
+                            Answer answer = new Answer(entity, frequencyArr, answerArr);
+
+                            allAnswers.add(answer);
+                        }
+                        else {
+                            return;
+                        }
                     }
                     else {
                         return;
@@ -125,18 +137,38 @@ public class HelloController {
         return postText;
     }
 
+    private String convertEntity(String entityFiledText){
+        String newText = entityFiledText;
+        if(entityFiledText.contains("_sentinel")){
+            newText = entityFiledText.substring(0, entityFiledText.indexOf('_'));
+        }
+        return newText;
+    }
+
     private float[] convertFrequency(String frequencyString){
-        String[] frequencyStrings = frequencyString.split("[,\\s]+");
+        String[] frequencyStrings = frequencyString.split("\\s+");
         float[] frequencyArr = new float[frequencyStrings.length];
         for (int i = 0; i < frequencyStrings.length; i++) {
+            frequencyStrings[i] = frequencyStrings[i].replace(',', '.');
             frequencyArr[i] = Float.parseFloat(frequencyStrings[i]);
         }
+
         return frequencyArr;
     }
 
     private String[] convertAnswer(String answer){
-        String[] answerArr = answer.split("[,\\s]+");
-        return answerArr;
+        String[] answerArrFirst = answer.split("~");
+        ArrayList<String> arr = new ArrayList<>();
+
+        for (String answ:answerArrFirst) {
+           if(!answ.equals("")){
+               arr.add(answ);
+           }
+        }
+
+        String []newList = new String[arr.size()];
+        arr.toArray(newList);
+        return newList;
     }
 
     private boolean checkWrongsPage(String form_url, String num_responses_text, ObservableList<Node> answerPlanes){
@@ -157,7 +189,7 @@ public class HelloController {
 
     private boolean checkWrongsLine(String entityFiledText, String frequencyFiledText, String answerFiledText, int counterLine){
         if (entityFiledText.equals("")){
-            createWrongTable("НЕВЕРНЫЙ ВВОД В ПОЛЕ НОМЕР " + counterLine, "Необходимо указать entity");
+            createWrongTable("НЕВЕРНЫЙ ВВОД В ПОЛЕ НОМЕР " + counterLine, "Необходимо указать entry");
             return false;
         }
         else if (frequencyFiledText.equals("")){
@@ -166,6 +198,18 @@ public class HelloController {
         }
         else if (answerFiledText.isEmpty()){
             createWrongTable("НЕВЕРНЫЙ ВВОД В ПОЛЕ НОМЕР " + counterLine, "Необходимо указать ответы");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkWrongsArrays(String entity, float[] frequencyArr, String[] answerArr, int counterLine){
+        if (!entity.contains("entry.")){
+            createWrongTable("НЕВЕРНЫЙ ВВОД В ПОЛЕ НОМЕР " + counterLine, "Необходимо верно указать entry (например <entry.1119440614>)");
+            return false;
+        }
+        else if (frequencyArr.length != answerArr.length){
+            createWrongTable("НЕВЕРНЫЙ ВВОД В ПОЛЕ НОМЕР " + counterLine, "Количество частот и ответов не совпадает, разделяйте частоты пробелом, а ответы знаком '~'");
             return false;
         }
         return true;
