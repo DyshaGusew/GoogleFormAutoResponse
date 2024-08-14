@@ -13,14 +13,22 @@ import java.nio.charset.StandardCharsets;
 public class HttpPostRequest {
 
     // Метод для отправки POST-запроса
-    public void sendPostRequest(String urlString, Map<String, String> postData) {
+    public boolean sendPostRequest(String urlString, Map<String, String> postData) {
         HttpURLConnection connection = null;
         try {
             // Преобразование данных в формат application/x-www-form-urlencoded
             String postDataString = convertToUrlEncoded(postData);
 
             // Создание URL и HttpURLConnection
-            URL url = new URL(urlString);
+            URL url;
+            try {
+                url = new URL(urlString);
+            }
+            catch (Exception e){
+                HelloController.createWrongTable("УКАЗАННЫЙ URL НЕДЕЙСТВИТЕЛЕН", "Попробуйте проверить соединение или указать другой URL (Например https://docs.google.com/forms/d/e/1FAIpQ/formResponse)\nURL должен оканчиваться на formResponse");
+                return false;
+            }
+
             connection = (HttpURLConnection) url.openConnection();
 
             // Настройка HttpURLConnection
@@ -49,17 +57,24 @@ public class HttpPostRequest {
                     while ((line = reader.readLine()) != null) {
                         errorResponse.append(line);
                     }
-                    System.err.println("Ответ ошибки: " + errorResponse.toString());
+                    System.err.println("Ответ ошибки: " + errorResponse);
+                    HelloController.createWrongTable("ОШИБКА ОТПРАВКИ НА СЕРВЕР", "Код: " + responseCode + "\nПроверьте правильность указанных данных");
+                    return false;
+                }
+                catch (Exception e){
+                    return false;
                 }
             }
         } catch (Exception e) {
             System.err.println("Ошибка: " + e.getMessage());
             e.printStackTrace();
+            return false;
         } finally {
             if (connection != null) {
                 connection.disconnect();
             }
         }
+        return true;
     }
 
     // Метод для настройки HttpURLConnection

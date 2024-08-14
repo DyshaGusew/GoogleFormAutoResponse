@@ -65,7 +65,18 @@ public class HelloController {
         String num_responses_text = numAnswerInput.getText();
         ObservableList<Node> answerPlanes = placeQuestionVBox.getChildren();
 
+
+
         if(checkWrongsPage(form_url, num_responses_text, answerPlanes)){
+            int num_responses;
+            try {
+                num_responses = Integer.parseInt(num_responses_text);
+            }
+            catch (NumberFormatException e){
+                createWrongTable("НЕВЕРНЫЙ ВВОД", "Необходимо указать количество ответов целым числом (например 5 или 13)");
+                return;
+            }
+
             // Create array of answers
             ArrayList<Answer> allAnswers = new ArrayList<>();
             int counter = 0;
@@ -86,7 +97,7 @@ public class HelloController {
                             frequencyArr = convertFrequency(frequencyFiledText.trim());
                         }
                         catch (NumberFormatException e){
-                            createWrongTable("НЕВЕРНЫЙ ВВОД В ПОЛЕ НОМЕР " + counter, "Необходимо верно указать частоты (например <0,5 0.1 0.4>)");
+                            createWrongTable("НЕВЕРНЫЙ ВВОД В ПОЛЕ НОМЕР " + counter, "Необходимо верно указать частоты (например <0.5 0.1 0.4>)");
                             return;
                         }
 
@@ -106,19 +117,25 @@ public class HelloController {
                 }
             }
 
-            int num_responses = Integer.parseInt(num_responses_text);
 
+
+            createSucsesfulyTable("ОЖИДАЙТЕ, ИДЕТ ОТПРАВКА ОТВЕТОВ", "Спасибо, за ожидание :)");
             // Pushing data
             for (int i = 0; i < num_responses; i++){
                 HttpPostRequest httpPostRequest = new HttpPostRequest();
                 Map<String, String> postText = CreateHashPostText(allAnswers);
-                httpPostRequest.sendPostRequest(form_url, postText);
-                printHashMap(postText);
 
-                System.out.println("[Answer number " + (i + 1) + " sends]");
+                if (httpPostRequest.sendPostRequest(form_url, postText)){
+                    System.out.println("[Answer number " + (i + 1) + " sends]");
+                }
+                else {
+                    System.out.println("[Answer number " + (i + 1) + " no sends((]");
+                    return;
+                }
+
+
             }
-
-            System.out.println("[All answers sends]");
+            createSucsesfulyTable("ВСЕ ОТВЕТЫ УСПЕШНО ОТПРАВЛЕНЫ", "Спасибо за использование программы)");
         }
     }
 
@@ -162,7 +179,7 @@ public class HelloController {
 
         for (String answ:answerArrFirst) {
            if(!answ.equals("")){
-               arr.add(answ);
+               arr.add(answ.trim());
            }
         }
 
@@ -215,10 +232,17 @@ public class HelloController {
         return true;
     }
 
-    private void createWrongTable(String textMain, String deepText){
+    public static void createWrongTable(String textMain, String deepText){
         Alert errorAlert = new Alert(Alert.AlertType.ERROR);
         errorAlert.setHeaderText(textMain);
         errorAlert.setContentText(deepText);
         errorAlert.showAndWait();
+    }
+
+    public static void createSucsesfulyTable(String textMain, String deepText){
+        Alert errorAlert = new Alert(Alert.AlertType.INFORMATION);
+        errorAlert.setHeaderText(textMain);
+        errorAlert.setContentText(deepText);
+        errorAlert.show();
     }
 }
