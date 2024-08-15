@@ -139,11 +139,6 @@ public class HelloController {
         }
     }
 
-    public static void printHashMap(Map<String, String> map) {
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            System.out.println(entry.getKey() + " : " + entry.getValue());
-        }
-    }
     private Map<String, String> CreateHashPostText(ArrayList<Answer> answers){
         Map<String, String> postText = new HashMap<>();
 

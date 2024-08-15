@@ -100,18 +100,5 @@ public class HttpPostRequest {
         }
         return encodedString.toString();
     }
-
-
-
-
-    // Пример использования
-    public static void main(String[] args) {
-        HttpPostRequest request = new HttpPostRequest();
-        Map<String, String> postData = Map.of(
-                "entry.1119440614", "Вариант4",
-                "entry.1668186261", "3"
-        );
-        request.sendPostRequest("https://docs.google.com/forms/d/e/1FAIpQLSeHfFYw2S0URXGh-U6uUqSZzVNUT49NOO1Ts6ErYS6Wnu_9iQ/formResponse", postData);
-    }
 }
 
